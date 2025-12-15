@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>caderninho</title> <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+    <title>caderninho</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -56,15 +58,6 @@
             object-fit: contain; 
             display: block;
         }
-        
-        /* Botão Sair */
-        #btn-logout-main {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3);
-            display: none; cursor: pointer; color: white; padding: 8px 16px;
-            border-radius: 4px; z-index: 1000;
-        }
-        #btn-logout-main:hover { background: rgba(255,0,0,0.6); border-color: red; }
     </style>
 </head>
 <body>
@@ -74,8 +67,6 @@
         <p>Faça login com o Google para acessar.</p>
         <button id="btn-login">Entrar com Google</button>
     </div>
-
-    <button id="btn-logout-main" onclick="fazerLogout()">Sair</button>
 
     <div id="book" class="flip-book">
         <div class="page"><img src="imagens/01.JPG" loading="lazy"></div>
@@ -126,7 +117,6 @@
 
         const loginScreen = document.getElementById('login-screen');
         const bookElement = document.getElementById('book');
-        const logoutBtn = document.getElementById('btn-logout-main');
         let pageFlip;
 
         // 1. Botão de Login
@@ -134,18 +124,13 @@
             auth.signInWithPopup(provider).catch(err => alert("Erro: " + err.message));
         });
 
-        // 2. Logout
-        window.fazerLogout = function() {
-            auth.signOut().then(() => location.reload());
-        }
-
-        // 3. Monitoramento e REGISTRO (LOG)
+        // 2. Monitoramento e REGISTRO (LOG)
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 // Usuário entrou!
                 loginScreen.style.display = 'none';
                 
-                // --- AQUI ACONTECE O REGISTRO ---
+                // Registra o acesso no banco
                 registrarAcesso(user);
 
                 // Mostra o livro direto
@@ -153,7 +138,6 @@
             } else {
                 loginScreen.style.display = 'block';
                 bookElement.style.display = 'none';
-                logoutBtn.style.display = 'none';
             }
         });
 
@@ -171,7 +155,6 @@
 
         function carregarLivro() {
             bookElement.style.display = 'block';
-            logoutBtn.style.display = 'block';
 
             if (!pageFlip) {
                 pageFlip = new St.PageFlip(document.getElementById('book'), {
